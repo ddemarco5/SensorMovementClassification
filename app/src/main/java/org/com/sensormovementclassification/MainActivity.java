@@ -2,6 +2,7 @@ package org.com.sensormovementclassification;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -10,6 +11,9 @@ import android.widget.TextView;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    //declare our sensorlog class as global
+    SensorLog sensorLog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,15 +46,19 @@ public class MainActivity extends ActionBarActivity {
     public void onToggleClicked(View view) {
         // Is the toggle on?
         boolean on = ((ToggleButton) view).isChecked();
-
         TextView logtext = (TextView)findViewById(R.id.textView);
+        logtext.setMovementMethod(new ScrollingMovementMethod());
 
         if (on) {
-            //logtext.append("Started.\n");
-            logtext.setText("Started.\n" + logtext.getText());
+            //create our sensorlog activity
+            sensorLog = new SensorLog(logtext, this);
+            sensorLog.startService();
+            logtext.append("Started.\n");
         } else {
             //logtext.append("Stopped.\n");
-            logtext.setText("Stopped.\n" + logtext.getText());
+            sensorLog.stopService();
+            //logtext.clearComposingText();
+            logtext.append("Stopped.\n");
         }
     }
 
