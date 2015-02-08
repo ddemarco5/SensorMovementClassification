@@ -8,9 +8,9 @@ import android.hardware.SensorManager;
 import android.widget.TextView;
 
 import android.os.Handler;
+
 import java.util.Vector;
 
-import org.com.sensormovementclassification.R;
 
 /*Dominic created class for logging accelerometer (for the moment) data
 TODO: Implement functionality for more sensors.
@@ -34,11 +34,13 @@ class xyzData{
 public class SensorLog implements SensorEventListener {
 
     Context mContext;
+    JMLFunctions jmlfuncs;
 
-    public SensorLog(TextView textview, Context mContext){
+    public SensorLog(TextView textview, Context mContext, JMLFunctions jmlfuncs){
         this.textview = textview;
         //the context passing is so this class can use getSystemService
         this.mContext = mContext;
+        this.jmlfuncs = jmlfuncs;
     }
 
     Vector<xyzData> accelDataVec = new Vector<xyzData>();
@@ -58,10 +60,14 @@ public class SensorLog implements SensorEventListener {
     //private int prevCycleTime = c.get(Calendar.SECOND);
 
     //This method will calculate the average of the data, print the data, and clear the vector
-    private void cyclePrintData(TextView viewtoprint){
+    private void cyclePrintData(TextView viewtoprint, JMLFunctions jmlfunc){
+
+        //Skip this function if there is no data to calculate.
+        if(accelDataVec.size() == 0) return;
+
         //calculate averages.
         xyzData avgData = new xyzData();
-        //TODO: try and find a way of doing this average step without danger of maxing out float's value.
+        //TODO: Update this average calculation to the sliding window average method.
         int vecSize=accelDataVec.size();
         for(int i=0; i<vecSize; i++){
             xyzData temp = accelDataVec.get(i);
@@ -69,11 +75,26 @@ public class SensorLog implements SensorEventListener {
         }
         avgData.set(avgData.getX()/vecSize, avgData.getY()/vecSize, avgData.getZ()/vecSize);
         cycle++;
-        viewtoprint.append(cycle + " - " + "X:" + Float.toString(avgData.getX()) + " Y:" + Float.toString(avgData.getY()) + " Z:" + Float.toString(avgData.getZ()) + "\n");
+        //viewtoprint.append(cycle + " - " + "X:" + Float.toString(avgData.getX()) + " Y:" + Float.toString(avgData.getY()) + " Z:" + Float.toString(avgData.getZ()) + "\n");
+        //TODO: CHANGE ME BACK
+        //String classification = jmlfunc.classifyXYZ(avgData.getX(),avgData.getY(),avgData.getZ());
+        String classification = jmlfunc.classifyY(avgData.getY());
+        if(classification.equals("1")){
+            viewtoprint.append("Hand!\n");
+        }
+        else if(classification.equals("2")){
+            viewtoprint.append("Pocket!\n");
+        }
+        else viewtoprint.append("Invalid classification: " + classification + "\n");
+
         int scrollAmount = viewtoprint.getLayout().getLineTop(viewtoprint.getLineCount()) - viewtoprint.getHeight();
         //automatically scroll to lowest line
         if (scrollAmount > 0) viewtoprint.scrollTo(0,scrollAmount);
         else viewtoprint.scrollTo(0,0);
+
+
+        //clear the vector to obtain new sensor information
+        accelDataVec.clear();
     }
 
 
@@ -81,13 +102,13 @@ public class SensorLog implements SensorEventListener {
     protected void startService() {
 
         senSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
-        senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
         senSensorManager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
         h.postDelayed(new Runnable(){
             public void run(){
                 //do something
-                cyclePrintData(textview);
+                cyclePrintData(textview, jmlfuncs);
                 h.postDelayed(this, delay);
             }
         }, delay);

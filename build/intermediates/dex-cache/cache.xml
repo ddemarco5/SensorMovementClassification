@@ -2,6 +2,20 @@
 <items version="2" >
 
     <item
+        jar="C:\Users\Dominic\Desktop\Android_Projects\SensorMovementClassification\javaml_0.1.5\javaml-0.1.5.jar"
+        jumboMode="false"
+        revision="21.1.0"
+        sha1="c0c248226c9c86bb495c8bda3847325e9f395e12">
+        <dex dex="C:\Users\Dominic\Desktop\Android_Projects\SensorMovementClassification\app\build\intermediates\pre-dexed\debug\javaml-0.1.5-97b99c1df662ac223d0bc1da0cc8b953900aef29.jar" />
+    </item>
+    <item
+        jar="C:\Users\Dominic\Desktop\Android_Projects\SensorMovementClassification\app\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.3\classes.jar"
+        jumboMode="false"
+        revision="21.1.0"
+        sha1="2c91c949a45a21cdecf26e03951e46c7beec9ad8">
+        <dex dex="C:\Users\Dominic\Desktop\Android_Projects\SensorMovementClassification\app\build\intermediates\pre-dexed\debug\classes-f7cfd91218f8c04e05723a1521c00dd37d2b6d93.jar" />
+    </item>
+    <item
         jar="C:\Users\Dominic\Desktop\Android_Projects\SensorMovementClassification\app\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.3\libs\internal_impl-21.0.3.jar"
         jumboMode="false"
         revision="21.1.0"
@@ -16,18 +30,18 @@
         <dex dex="C:\Users\Dominic\Desktop\Android_Projects\SensorMovementClassification\app\build\intermediates\pre-dexed\debug\support-annotations-21.0.3-cc63375d9dedc1a8febbcfb74cf09f41590c3d26.jar" />
     </item>
     <item
+        jar="C:\Users\Dominic\Desktop\Android_Projects\SensorMovementClassification\ajt-1.20\ajt-1.20.jar"
+        jumboMode="false"
+        revision="21.1.0"
+        sha1="3c3aff9986a7bdd0d43def3ea6687d803d6b1dfb">
+        <dex dex="C:\Users\Dominic\Desktop\Android_Projects\SensorMovementClassification\app\build\intermediates\pre-dexed\debug\ajt-1.20-35ccd4c2f17d151283cf13ba19ad231984b4bce0.jar" />
+    </item>
+    <item
         jar="C:\Users\Dominic\Desktop\Android_Projects\SensorMovementClassification\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\21.0.3\classes.jar"
         jumboMode="false"
         revision="21.1.0"
         sha1="81d42bf983a8741f4888a6e333e454e4a5e0eeb7">
         <dex dex="C:\Users\Dominic\Desktop\Android_Projects\SensorMovementClassification\app\build\intermediates\pre-dexed\debug\classes-8d24a204466d7833fc91dcb20014f5c7be21a0a7.jar" />
-    </item>
-    <item
-        jar="C:\Users\Dominic\Desktop\Android_Projects\SensorMovementClassification\app\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.3\classes.jar"
-        jumboMode="false"
-        revision="21.1.0"
-        sha1="2c91c949a45a21cdecf26e03951e46c7beec9ad8">
-        <dex dex="C:\Users\Dominic\Desktop\Android_Projects\SensorMovementClassification\app\build\intermediates\pre-dexed\debug\classes-f7cfd91218f8c04e05723a1521c00dd37d2b6d93.jar" />
     </item>
 
 </items>

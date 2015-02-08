@@ -1,5 +1,6 @@
 package org.com.sensormovementclassification;
 
+import android.os.PowerManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -14,11 +15,22 @@ public class MainActivity extends ActionBarActivity {
 
     //declare our sensorlog class as global
     SensorLog sensorLog;
+    //We have to declare our machine learning class
+    JMLFunctions jml;
+
+    //Get the powermanager for the partial wake lock. Needed to collect data when the screen is off
+    //TODO:Find a better alternative to this?
+    PowerManager pm;
+    PowerManager.WakeLock wl;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        jml = new JMLFunctions((TextView)findViewById(R.id.textView));
+        pm = (PowerManager) getSystemService(this.POWER_SERVICE);
+        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Log Wakelock");
     }
 
     @Override
@@ -50,11 +62,16 @@ public class MainActivity extends ActionBarActivity {
         logtext.setMovementMethod(new ScrollingMovementMethod());
 
         if (on) {
+            //get our wakelock
+            wl.acquire();
             //create our sensorlog activity
-            sensorLog = new SensorLog(logtext, this);
+            sensorLog = new SensorLog(logtext, this, jml);
             sensorLog.startService();
             logtext.append("Started.\n");
+
         } else {
+            //release our wakelock
+            wl.release();
             //logtext.append("Stopped.\n");
             sensorLog.stopService();
             //logtext.clearComposingText();
