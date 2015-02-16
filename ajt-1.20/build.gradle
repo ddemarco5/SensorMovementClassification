@@ -1,2 +1,0 @@
-configurations.create("default")
-artifacts.add("default", file('ajt-1.20.jar'))
