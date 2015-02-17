@@ -1,5 +1,8 @@
 package jsat.com.sensormovementclassification;
 
+import android.app.ActionBar;
+import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.PowerManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -28,8 +31,13 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //TODO: Put some tabs or some ease of naviation into the app.
+
+
         jml = new JMLFunctions((TextView)findViewById(R.id.textView));
         pm = (PowerManager) getSystemService(this.POWER_SERVICE);
         wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Log Wakelock");
@@ -79,6 +87,11 @@ public class MainActivity extends ActionBarActivity {
             //logtext.clearComposingText();
             logtext.append("Stopped.\n");
         }
+    }
+
+    public void launchManager(View view){
+        Intent myIntent = new Intent(MainActivity.this, ManageTrainingData.class);
+        MainActivity.this.startActivity(myIntent);
     }
 
 }

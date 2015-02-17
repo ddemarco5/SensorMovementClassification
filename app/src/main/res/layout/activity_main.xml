@@ -26,4 +26,16 @@
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/toggleButton" />
 
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Manage"
+        android:id="@+id/button"
+        android:layout_above="@+id/textView"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="false"
+        android:onClick="launchManager" />
+
 </RelativeLayout>

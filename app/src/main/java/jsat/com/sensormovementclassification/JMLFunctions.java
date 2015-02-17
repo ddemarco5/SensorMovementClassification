@@ -4,20 +4,16 @@ import android.os.Environment;
 import android.widget.TextView;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Random;
 
 
 import jsat.ARFFLoader;
 import jsat.DataSet;
-import jsat.classifiers.CategoricalData;
 import jsat.classifiers.CategoricalResults;
 import jsat.classifiers.ClassificationDataSet;
 import jsat.classifiers.DataPoint;
 import jsat.classifiers.trees.RandomForest;
 import jsat.linear.DenseVector;
-import jsat.linear.Vec;
-import jsat.regression.RegressionDataSet;
+
 
 /**
  * Created by Dominic on 2/1/2015.
@@ -31,7 +27,7 @@ public class JMLFunctions {
 
     File DATA_PATH = Environment.getExternalStorageDirectory();
     String TRAIN_DATA_PATH = "/SensorExperiment/TrainData";
-    String TRAIN_FILE_NAME = "/train.arff";
+    String TRAIN_FILE_NAME = "/train2.arff";
 
     public JMLFunctions(TextView textview){
         this.textview = textview;
@@ -40,7 +36,7 @@ public class JMLFunctions {
 
     /** Takes xyz data and returns the classification **/
     public String classifyXYZ(double x, double y, double z){
-        DataPoint pointtoclassify = new DataPoint(DenseVector.toDenseVec(y));
+        DataPoint pointtoclassify = new DataPoint(DenseVector.toDenseVec(x,y,z));
         CategoricalResults results = test.classify(pointtoclassify);
         return results.toString();
     }
@@ -69,7 +65,8 @@ public class JMLFunctions {
         }
 
 
-        test = new RandomForest(2);
+        //subject to change.
+        test = new RandomForest(10);
 
 
         ClassificationDataSet classdata = new ClassificationDataSet(traindata, 0);

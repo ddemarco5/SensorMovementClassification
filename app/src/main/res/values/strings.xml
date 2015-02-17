@@ -4,5 +4,7 @@
     <string name="app_name">SensorMovementClassification</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_manage_training_data">Training Data</string>
+    <string name="action_new">action_new</string>
 
 </resources>

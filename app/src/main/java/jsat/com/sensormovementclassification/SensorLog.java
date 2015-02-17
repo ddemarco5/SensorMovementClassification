@@ -31,7 +31,7 @@ class xyzData{
 
 }
 
-public class SensorLog implements SensorEventListener {
+public class SensorLog {
 
     Context mContext;
     JMLFunctions jmlfuncs;
@@ -43,11 +43,13 @@ public class SensorLog implements SensorEventListener {
         this.jmlfuncs = jmlfuncs;
     }
 
-    Vector<xyzData> orientDataVec = new Vector<xyzData>();
+    Vector<xyzData> gyroDataVec = new Vector<xyzData>();
 
     public TextView textview;
-    private SensorManager senSensorManager;
-    private Sensor senAccelerometer;
+    private SensorManager sensorManager;
+    private SensorEventListener sensorListener;
+    private Sensor senGyroscope;
+    private Sensor senProximity;
 
     //this are cyclePrintData's params. It is needed for postDelayed loop.
     Handler h = new Handler();
@@ -63,19 +65,19 @@ public class SensorLog implements SensorEventListener {
     private void cyclePrintData(TextView viewtoprint, JMLFunctions jmlfunc){
 
         //Skip this function if there is no data to calculate.
-        if(orientDataVec.size() == 0) return;
+        if(gyroDataVec.size() == 0) return;
 
         //calculate averages.
         xyzData avgData = new xyzData();
         //TODO: Update this average calculation to the sliding window average method.
-        int vecSize=orientDataVec.size();
+        int vecSize= gyroDataVec.size();
         for(int i=0; i<vecSize; i++){
-            xyzData temp = orientDataVec.get(i);
+            xyzData temp = gyroDataVec.get(i);
             avgData.set(temp.getX()+avgData.getX(), temp.getY()+avgData.getY(), temp.getZ()+avgData.getZ());
         }
         avgData.set(avgData.getX()/vecSize, avgData.getY()/vecSize, avgData.getZ()/vecSize);
         cycle++;
-        //viewtoprint.append(cycle + " - " + "X:" + Float.toString(avgData.getX()) + " Y:" + Float.toString(avgData.getY()) + " Z:" + Float.toString(avgData.getZ()) + "\n");
+        viewtoprint.append(cycle + " - " + "X:" + Float.toString(avgData.getX()) + " Y:" + Float.toString(avgData.getY()) + " Z:" + Float.toString(avgData.getZ()) + "\n");
         String classification = jmlfunc.classifyXYZ(avgData.getX(), avgData.getY(), avgData.getZ());
         viewtoprint.append(classification + "\n");
 
@@ -86,17 +88,45 @@ public class SensorLog implements SensorEventListener {
 
 
         //clear the vector to obtain new sensor information
-        orientDataVec.clear();
+        gyroDataVec.clear();
     }
 
 
     //@Override
     protected void startService() {
 
-        senSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
-        senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
-        senSensorManager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
 
+        //here we create our sensor listener.
+        sensorListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged (SensorEvent event){
+                Sensor sensor = event.sensor;
+                //Sanity check to make sure we have the accelerometer.
+                if (sensor.getType() == Sensor.TYPE_ORIENTATION) {
+                    xyzData tempdata = new xyzData();
+                    tempdata.set(event.values[0], event.values[1], event.values[2]);
+                    gyroDataVec.add(tempdata);
+                } else if (sensor.getType() == Sensor.TYPE_PROXIMITY) {
+                    textview.append("Prox: " + event.values[0] + "\n");
+                } else {
+                    textview.append("No sensor of known type. It's " + sensor.getName() + "\n");
+                }
+
+            }
+
+            @Override
+            public void onAccuracyChanged (Sensor sensor,int accuracy){
+
+            }
+        };
+
+        senGyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION); //my droid 4 doesn't have TYPE_GYROSCOPE.
+        senProximity = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        sensorManager.registerListener(sensorListener, senGyroscope, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(sensorListener, senProximity, SensorManager.SENSOR_DELAY_NORMAL);
+
+        //This will run the cyclePrintData once the set delay is up.
         h.postDelayed(new Runnable(){
             public void run(){
                 //do something
@@ -108,37 +138,20 @@ public class SensorLog implements SensorEventListener {
 
     protected void stopService(){
         h.removeCallbacksAndMessages(null);
-        senSensorManager.unregisterListener(this);
+        sensorManager.unregisterListener(sensorListener);
     }
 
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        Sensor accelSensor = event.sensor;
-        //Sanity check to make sure we have the accelerometer.
-        if (accelSensor.getType() != Sensor.TYPE_ACCELEROMETER){
-            //PRINT ERROR HERE
-        }
-        xyzData tempdata = new xyzData();
-        tempdata.set(event.values[0],event.values[1],event.values[2]);
-        orientDataVec.add(tempdata);
 
-
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
 
     /*
     protected void onPause() {
         super.onPause();
-        senSensorManager.unregisterListener(this);
+        sensensorManager.unregisterListener(this);
     }
 
     protected void onResume() {
         super.onResume();
-        senSensorManager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        sensensorManager.registerListener(this, senGyroscope, SensorManager.SENSOR_DELAY_NORMAL);
     }
     */
 }
