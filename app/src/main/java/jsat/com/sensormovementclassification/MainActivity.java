@@ -1,9 +1,8 @@
 package jsat.com.sensormovementclassification;
 
-import android.app.ActionBar;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.PowerManager;
+import android.os.CountDownTimer;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -39,6 +38,7 @@ public class MainActivity extends ActionBarActivity {
 
 
         jml = new JMLFunctions((TextView)findViewById(R.id.textView));
+        jml.readTrainingData();
         pm = (PowerManager) getSystemService(this.POWER_SERVICE);
         wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Log Wakelock");
     }
@@ -65,18 +65,21 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void onToggleClicked(View view) {
+    public void onToggleClicked(View view){
         // Is the toggle on?
         boolean on = ((ToggleButton) view).isChecked();
         TextView logtext = (TextView)findViewById(R.id.textView);
         logtext.setMovementMethod(new ScrollingMovementMethod());
+
+
 
         if (on) {
             //get our wakelock
             wl.acquire();
             //create our sensorlog activity
             sensorLog = new SensorLog(logtext, this, jml);
-            sensorLog.startService();
+            //TODO: fix up the sensorlog class to make printing and recording data make more sense.
+            sensorLog.startService(false, 0);
             logtext.append("Started.\n");
 
         } else {

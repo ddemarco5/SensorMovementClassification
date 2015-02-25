@@ -29,6 +29,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="jsat.com.sensormovementclassification.MainActivity" />
         </activity>
+        <activity
+            android:name="jsat.com.sensormovementclassification.SensorRecord"
+            android:label="@string/title_activity_sensor_record"
+            android:parentActivityName="jsat.com.sensormovementclassification.ManageTrainingData" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="jsat.com.sensormovementclassification.ManageTrainingData" />
+        </activity>
     </application>
 
 </manifest>

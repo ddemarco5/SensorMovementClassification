@@ -6,5 +6,6 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_manage_training_data">Training Data</string>
     <string name="action_new">action_new</string>
+    <string name="title_activity_sensor_record">SensorRecord</string>
 
 </resources>

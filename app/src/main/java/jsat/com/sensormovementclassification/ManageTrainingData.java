@@ -3,6 +3,7 @@ package jsat.com.sensormovementclassification;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -13,7 +14,6 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import org.com.sensormovementclassification.R;
 
@@ -114,14 +114,17 @@ public class ManageTrainingData extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_new) {
-            File file = new File(path + "/delete.me");
+               Intent myIntent = new Intent(ManageTrainingData.this, SensorRecord.class);
+               ManageTrainingData.this.startActivity(myIntent);
+
+            /*File file = new File(path + "/delete.me");
             try {
                 file.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
             refreshTrainData();
-            return true;
+            return true;*/
         }
 
         return super.onOptionsItemSelected(item);

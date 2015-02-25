@@ -29,9 +29,10 @@ public class JMLFunctions {
     String TRAIN_DATA_PATH = "/SensorExperiment/TrainData";
     String TRAIN_FILE_NAME = "/train2.arff";
 
+
     public JMLFunctions(TextView textview){
         this.textview = textview;
-        readTrainingData();
+        //readTrainingData();
     }
 
     /** Takes xyz data and returns the classification **/
@@ -41,7 +42,7 @@ public class JMLFunctions {
         return results.toString();
     }
 
-    private void readTrainingData(){
+    public void readTrainingData(){
         textview.append("Checking for base files...\n");
         //trainfile = new File(DATA_PATH + TRAIN_DATA_PATH, "train.csv");
         //textview.append(trainfile.toString() + "\n");
