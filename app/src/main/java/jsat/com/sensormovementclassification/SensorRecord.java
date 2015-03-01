@@ -66,7 +66,7 @@ public class SensorRecord extends ActionBarActivity {
 
             public void onFinish() {
                 msgtext.setText("Recording");
-                senslog.startService(false, Integer.parseInt(inputtext.getText().toString()));
+                senslog.startService(true, inputtext.getText().toString());
             }
         }.start();
 

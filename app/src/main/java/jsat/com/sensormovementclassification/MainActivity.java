@@ -79,7 +79,7 @@ public class MainActivity extends ActionBarActivity {
             //create our sensorlog activity
             sensorLog = new SensorLog(logtext, this, jml);
             //TODO: fix up the sensorlog class to make printing and recording data make more sense.
-            sensorLog.startService(false, 0);
+            sensorLog.startService(false, "0");
             logtext.append("Started.\n");
 
         } else {

@@ -43,7 +43,7 @@
         android:layout_alignRight="@+id/toggleButton2"
         android:layout_alignEnd="@+id/toggleButton2"
         android:inputType="text"
-        android:text="# of activity" />
+        android:text="activity name" />
 
     <TextView
         android:layout_width="wrap_content"
