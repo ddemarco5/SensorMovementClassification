@@ -66,6 +66,7 @@ public class SensorLog {
     private SensorManager sensorManager;
     private SensorEventListener sensorListener;
     private Sensor senGyroscope;
+    private Sensor senAccel;
     private Sensor senProximity;
     private Sensor senLight;
 
@@ -115,7 +116,7 @@ public class SensorLog {
     private void cyclePrintData(TextView viewtoprint, JMLFunctions jmlfunc){
 
         //Skip this function if there is no data to calculate.
-        if(gyroDataVec.size() == 0 || accelDataVec.size() == 0 || lightDataVec.size() == 0) return;
+        //if(gyroDataVec.size() == 0 || accelDataVec.size() == 0 || lightDataVec.size() == 0) return;
 
         //calculate averages.
         xyzData gyroavg = avgXYZ(gyroDataVec);
@@ -123,9 +124,8 @@ public class SensorLog {
         Float lightavg = avgFloat(lightDataVec);
 
         cycle++;
-        //TODO: Print the other sensors in this loop.
-        viewtoprint.append("gyro - " + "X:" + Float.toString(gyroavg.getX()) + " Y:" + Float.toString(gyroavg.getY()) + " Z:" + Float.toString(gyroavg.getZ()) + "\n");
-        String classification = jmlfunc.classifyXYZ(gyroavg.getX(), gyroavg.getY(), gyroavg.getZ());
+        //viewtoprint.append("gyro - " + "X:" + Float.toString(gyroavg.getX()) + " Y:" + Float.toString(gyroavg.getY()) + " Z:" + Float.toString(gyroavg.getZ()) + "\n");
+        String classification = jmlfunc.classify(gyroavg.getX(), gyroavg.getY(), gyroavg.getZ(), accelavg.getX(), accelavg.getY(), accelavg.getZ(), lightavg);
         viewtoprint.append(classification + "\n");
 
         int scrollAmount = viewtoprint.getLayout().getLineTop(viewtoprint.getLineCount()) - viewtoprint.getHeight();
@@ -160,10 +160,11 @@ public class SensorLog {
         else{
             gyroavg = avgXYZ(gyroDataVec);
         }
-        /*if(accelDataVec.size() == 0){
+
+        if(accelDataVec.size() == 0){
             if(prevAccel != null){
                 textview.setText("No info from accel, using previous value.\n");
-                accelavg = prevAccess;
+                accelavg = prevAccel;
             }
             else {
                 textview.setText("No info from accel, waiting.\n");
@@ -172,7 +173,8 @@ public class SensorLog {
         }
         else{
             accelavg = avgXYZ(accelDataVec);
-        }*/
+        }
+
         if(lightDataVec.size() == 0){
             if(prevLight != 0){
                 textview.setText("No info from light, using previous value.\n");
@@ -190,17 +192,18 @@ public class SensorLog {
         //calculate averages.
 
         prevGyro = gyroavg;
-        //prevAccel = accelavg;
+        prevAccel = accelavg;
         prevLight = lightavg;
 
         //This is where we will create an instance and add it to the dataset.
         List<Double> tmplist = new ArrayList<Double>();
         tmplist.add((double)gyroavg.getX()); tmplist.add((double)gyroavg.getY()); tmplist.add((double)gyroavg.getZ());
-        //Temp removal of accel. My phone is being weird about it.
-        //tmplist.add((double)accelavg.getX()); tmplist.add((double)accelavg.getY()); tmplist.add((double)accelavg.getZ());
+        tmplist.add((double)accelavg.getX()); tmplist.add((double)accelavg.getY()); tmplist.add((double)accelavg.getZ());
         tmplist.add((double)lightavg);
         Vec vectoadd = new DenseVector(tmplist);
-        datatolog.addDataPoint(vectoadd, 0);
+        //check to make sure we have enough attributes.
+        if(vectoadd.length() == 7) //TODO:bad form, hardcoded var. Change me.
+            datatolog.addDataPoint(vectoadd, 0);
 
         textview.append("Data point logged.\n");
 
@@ -223,11 +226,15 @@ public class SensorLog {
         decidingdata.setOptionName(classification, 0);
 
 
-        datatolog = new ClassificationDataSet(4, new CategoricalData[0], decidingdata);
+        datatolog = new ClassificationDataSet(7, new CategoricalData[0], decidingdata);
         datatolog.setNumericName("gyroX", 0);
         datatolog.setNumericName("gyroY", 1);
         datatolog.setNumericName("gyroZ", 2);
-        datatolog.setNumericName("light", 3);
+        datatolog.setNumericName("accelX", 3);
+        datatolog.setNumericName("accelY", 4);
+        datatolog.setNumericName("accelZ", 5);
+        datatolog.setNumericName("light", 6);
+        //datatolog.setNumericName("light", 3);
 
 
         filename = classification;
@@ -263,14 +270,17 @@ public class SensorLog {
         };
 
         senGyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION); //my droid 4 doesn't have TYPE_GYROSCOPE.
-        senProximity = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        senAccel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        //senProximity = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
         senLight = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         sensorManager.registerListener(sensorListener, senGyroscope, SensorManager.SENSOR_DELAY_NORMAL);
-        sensorManager.registerListener(sensorListener, senProximity, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(sensorListener, senAccel, SensorManager.SENSOR_DELAY_NORMAL);
+        //sensorManager.registerListener(sensorListener, senProximity, SensorManager.SENSOR_DELAY_NORMAL);
         sensorManager.registerListener(sensorListener, senLight, SensorManager.SENSOR_DELAY_NORMAL);
 
         //This will run the cyclePrintData once the set delay is up.
         if(!log) { //We aren't logging data
+            textview.append("Running print.\n");
             h.postDelayed(new Runnable() {
                 public void run() {
                     cyclePrintData(textview, jmlfuncs);
@@ -279,6 +289,7 @@ public class SensorLog {
             }, delay);
         }
         else{//we're recording the data
+            textview.append("Running record.\n");
             h.postDelayed(new Runnable() {
                 public void run() {
                     cycleRecordData(jmlfuncs, classification);
@@ -292,16 +303,16 @@ public class SensorLog {
         h.removeCallbacksAndMessages(null);
         sensorManager.unregisterListener(sensorListener);
 
-        String OUTPUT_FILE = Environment.getExternalStorageDirectory() + "/SensorExperiment/TrainData/" + filename + ".arff";
-
-        FileOutputStream fout = null;
-        try {
-            fout = new FileOutputStream(OUTPUT_FILE);
-        } catch (Exception e) {
-            System.err.print(e.toString());
-        }
 
         if(log == true){
+            String OUTPUT_FILE = Environment.getExternalStorageDirectory() + "/SensorExperiment/TrainData/" + filename + ".arff";
+
+            FileOutputStream fout = null;
+            try {
+                fout = new FileOutputStream(OUTPUT_FILE);
+            } catch (Exception e) {
+                System.err.print(e.toString());
+            }
             ARFFLoader.writeArffFile(datatolog,fout);
             try {
                 fout.flush();

@@ -24,6 +24,7 @@
         <activity
             android:name="jsat.com.sensormovementclassification.ManageTrainingData"
             android:label="@string/title_activity_manage_training_data"
+            android:screenOrientation="portrait" >
             android:parentActivityName="jsat.com.sensormovementclassification.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -32,6 +33,7 @@
         <activity
             android:name="jsat.com.sensormovementclassification.SensorRecord"
             android:label="@string/title_activity_sensor_record"
+            android:screenOrientation="portrait" >
             android:parentActivityName="jsat.com.sensormovementclassification.ManageTrainingData" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
