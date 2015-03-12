@@ -185,7 +185,7 @@ public class SensorLog {
         }
 
         if(lightDataVec.size() == 0){
-            if(prevLight != 0){
+            if(prevLight != null){
                 textview.setText("No info from light, using previous value.\n");
                 lightavg = prevLight;
             }

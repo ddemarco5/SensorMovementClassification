@@ -121,7 +121,7 @@ public class JMLFunctions {
         }
         */
 
-        //subject to change.
+        //subject to change, currently the forest has as many trees as there are attributes in the data set.
         test = new RandomForest(num_attributes);
 
 
