@@ -236,14 +236,17 @@ public class SensorLog {
     }
 
     public void unregisterListeners(){
-        sensorManager.unregisterListener(sensorListener);
+        if(sensorManager != null && sensorListener != null)
+            sensorManager.unregisterListener(sensorListener);
     }
 
     public void registerListeners(){
-        sensorManager.registerListener(sensorListener, senGyroscope, SensorManager.SENSOR_DELAY_NORMAL);
-        sensorManager.registerListener(sensorListener, senAccel, SensorManager.SENSOR_DELAY_NORMAL);
-        //sensorManager.registerListener(sensorListener, senProximity, SensorManager.SENSOR_DELAY_NORMAL);
-        sensorManager.registerListener(sensorListener, senLight, SensorManager.SENSOR_DELAY_NORMAL);
+        if(sensorManager != null && sensorListener != null) {
+            sensorManager.registerListener(sensorListener, senGyroscope, SensorManager.SENSOR_DELAY_NORMAL);
+            sensorManager.registerListener(sensorListener, senAccel, SensorManager.SENSOR_DELAY_NORMAL);
+            //sensorManager.registerListener(sensorListener, senProximity, SensorManager.SENSOR_DELAY_NORMAL);
+            sensorManager.registerListener(sensorListener, senLight, SensorManager.SENSOR_DELAY_NORMAL);
+        }
     }
 
     private void startService(final boolean log, final String classification) {

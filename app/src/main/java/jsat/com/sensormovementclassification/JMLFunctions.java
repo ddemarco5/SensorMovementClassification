@@ -73,6 +73,10 @@ public class JMLFunctions {
             textview.append("Error loading datasets!\n" + e.toString() + "\n");
             return;
         }
+        if(f.listFiles().length == 0){
+            textview.append("No data files found.");
+            return;
+        }
         textview.append("Data sets loaded, now attempting merge.\n");
 
 
@@ -96,30 +100,6 @@ public class JMLFunctions {
             textview.append("\t" + mergeddataset.getCategoryName(i) + "\n");
         //textview.append("DEBUG " + mergeddataset.getNumCategoricalVars() + "\n");
 
-
-        /*
-        textview.append("Checking for base files...\n");
-        //trainfile = new File(DATA_PATH + TRAIN_DATA_PATH, "train.csv");
-        //textview.append(trainfile.toString() + "\n");
-
-        textview.append("Loading file...\n");
-        try {
-            //source = new DataSource(DATA_PATH + TRAIN_DATA_PATH + "/train.csv");
-            datafile = new File(DATA_PATH + TRAIN_DATA_PATH + TRAIN_FILE_NAME);
-            traindata = ARFFLoader.loadArffFile(datafile);
-        } catch (Exception e) {
-            textview.append("Error loading dataset!\n" + e.toString() + "\n");
-            return;
-        }
-        if(traindata.getSampleSize() > 0){
-            //Some nice debug info
-            textview.append("Dataset contains " + traindata.getSampleSize() + " instances!\n");
-            textview.append("Dataset contains " + traindata.getNumCategoricalVars() + " categories!\n");
-            for(int i = 0; i <  traindata.getNumCategoricalVars(); i++)
-                textview.append("\t" + traindata.getCategoryName(i) + "\n");
-
-        }
-        */
 
         //subject to change, currently the forest has as many trees as there are attributes in the data set.
         test = new RandomForest(num_attributes);

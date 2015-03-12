@@ -1,6 +1,7 @@
 package jsat.com.sensormovementclassification;
 
 import android.os.CountDownTimer;
+import android.os.PowerManager;
 import android.os.SystemClock;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -22,6 +23,9 @@ public class SensorRecord extends ActionBarActivity {
     JMLFunctions jmlfuncs = new JMLFunctions(logtext);
     SensorLog senslog;
 
+    PowerManager pm;
+    PowerManager.WakeLock wl;
+
 
 
     @Override
@@ -32,6 +36,9 @@ public class SensorRecord extends ActionBarActivity {
         msgtext = (TextView)findViewById(R.id.textView2);
         inputtext = (EditText)findViewById(R.id.editText);
         senslog = new SensorLog(logtext,this,jmlfuncs);
+
+        pm = (PowerManager) getSystemService(this.POWER_SERVICE);
+        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Record Wakelock");
     }
 
 
@@ -81,14 +88,33 @@ public class SensorRecord extends ActionBarActivity {
             //create our sensorlog activity
             //sensorLog = new SensorLog(logtext, this, jml);
             //sensorLog.startService();
+            wl.acquire();
             countdown(msgtext);
 
         } else {
             //logtext.append("Stopped.\n");
             //sensorLog.stopService();
             //logtext.clearComposingText();
+            wl.release();
             msgtext.setText("Stopped.\n");
             senslog.stopService();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(senslog != null) {
+            senslog.unregisterListeners();
+            senslog.registerListeners();
+        }
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(senslog != null) {
+            senslog.unregisterListeners();
+            senslog.registerListeners();
         }
     }
 
