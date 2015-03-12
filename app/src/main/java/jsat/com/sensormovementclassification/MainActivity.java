@@ -22,6 +22,8 @@ public class MainActivity extends ActionBarActivity {
     //We have to declare our machine learning class
     JMLFunctions jml;
 
+    TextView logtext;
+
     //Get the powermanager for the partial wake lock. Needed to collect data when the screen is off
     //TODO:Find a better alternative to this?
     PowerManager pm;
@@ -30,11 +32,13 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //sensorLog = new SensorLog(logtext, this, jml);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //TODO: Put some tabs or some ease of naviation into the app.
+        logtext = (TextView)findViewById(R.id.textView);
+        logtext.setMovementMethod(new ScrollingMovementMethod());
 
 
         jml = new JMLFunctions((TextView)findViewById(R.id.textView));
@@ -68,8 +72,8 @@ public class MainActivity extends ActionBarActivity {
     public void onToggleClicked(View view){
         // Is the toggle on?
         boolean on = ((ToggleButton) view).isChecked();
-        TextView logtext = (TextView)findViewById(R.id.textView);
-        logtext.setMovementMethod(new ScrollingMovementMethod());
+        //TextView logtext = (TextView)findViewById(R.id.textView);
+        //logtext.setMovementMethod(new ScrollingMovementMethod());
 
 
 
@@ -78,8 +82,8 @@ public class MainActivity extends ActionBarActivity {
             wl.acquire();
             //create our sensorlog activity
             sensorLog = new SensorLog(logtext, this, jml);
-            //TODO: fix up the sensorlog class to make printing and recording data make more sense.
-            sensorLog.startService(false, "0");
+
+            sensorLog.startListenerService();
             logtext.append("Started.\n");
 
         } else {
@@ -95,6 +99,23 @@ public class MainActivity extends ActionBarActivity {
     public void launchManager(View view){
         Intent myIntent = new Intent(MainActivity.this, ManageTrainingData.class);
         MainActivity.this.startActivity(myIntent);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(sensorLog != null) {
+            sensorLog.unregisterListeners();
+            sensorLog.registerListeners();
+        }
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(sensorLog != null) {
+            sensorLog.unregisterListeners();
+            sensorLog.registerListeners();
+        }
     }
 
 }

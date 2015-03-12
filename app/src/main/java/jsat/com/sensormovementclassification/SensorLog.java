@@ -14,6 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
@@ -125,7 +126,15 @@ public class SensorLog {
 
         cycle++;
         //viewtoprint.append("gyro - " + "X:" + Float.toString(gyroavg.getX()) + " Y:" + Float.toString(gyroavg.getY()) + " Z:" + Float.toString(gyroavg.getZ()) + "\n");
-        String classification = jmlfunc.classify(gyroavg.getX(), gyroavg.getY(), gyroavg.getZ(), accelavg.getX(), accelavg.getY(), accelavg.getZ(), lightavg);
+        //TODO: this will have to change when the sensor selection becomes dynamic (not hardcoded)
+        List<Double> datalist = Arrays.asList((double) gyroavg.getX(),
+                new Double(gyroavg.getY()),
+                new Double(gyroavg.getZ()),
+                new Double(accelavg.getX()),
+                new Double(accelavg.getY()),
+                new Double(accelavg.getZ()),
+                new Double(lightavg));
+        String classification = jmlfunc.classify(datalist);
         viewtoprint.append(classification + "\n");
 
         int scrollAmount = viewtoprint.getLayout().getLineTop(viewtoprint.getLineCount()) - viewtoprint.getHeight();
@@ -197,9 +206,13 @@ public class SensorLog {
 
         //This is where we will create an instance and add it to the dataset.
         List<Double> tmplist = new ArrayList<Double>();
-        tmplist.add((double)gyroavg.getX()); tmplist.add((double)gyroavg.getY()); tmplist.add((double)gyroavg.getZ());
-        tmplist.add((double)accelavg.getX()); tmplist.add((double)accelavg.getY()); tmplist.add((double)accelavg.getZ());
-        tmplist.add((double)lightavg);
+        tmplist.add(new Double(gyroavg.getX()));
+        tmplist.add(new Double(gyroavg.getY()));
+        tmplist.add(new Double(gyroavg.getZ()));
+        tmplist.add(new Double(accelavg.getX()));
+        tmplist.add(new Double(accelavg.getY()));
+        tmplist.add(new Double(accelavg.getZ()));
+        tmplist.add(new Double(lightavg));
         Vec vectoadd = new DenseVector(tmplist);
         //check to make sure we have enough attributes.
         if(vectoadd.length() == 7) //TODO:bad form, hardcoded var. Change me.
@@ -214,8 +227,26 @@ public class SensorLog {
     }
 
 
-    //@Override
-    protected void startService(final boolean log, final String classification) {
+    public void startListenerService(){
+        startService(false, "dummy");
+    }
+
+    public void startRecordingService(String classification){
+        startService(true, classification);
+    }
+
+    public void unregisterListeners(){
+        sensorManager.unregisterListener(sensorListener);
+    }
+
+    public void registerListeners(){
+        sensorManager.registerListener(sensorListener, senGyroscope, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(sensorListener, senAccel, SensorManager.SENSOR_DELAY_NORMAL);
+        //sensorManager.registerListener(sensorListener, senProximity, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(sensorListener, senLight, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    private void startService(final boolean log, final String classification) {
 
 
         //Set the global log variable.
@@ -273,10 +304,7 @@ public class SensorLog {
         senAccel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         //senProximity = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
         senLight = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-        sensorManager.registerListener(sensorListener, senGyroscope, SensorManager.SENSOR_DELAY_NORMAL);
-        sensorManager.registerListener(sensorListener, senAccel, SensorManager.SENSOR_DELAY_NORMAL);
-        //sensorManager.registerListener(sensorListener, senProximity, SensorManager.SENSOR_DELAY_NORMAL);
-        sensorManager.registerListener(sensorListener, senLight, SensorManager.SENSOR_DELAY_NORMAL);
+        registerListeners();
 
         //This will run the cyclePrintData once the set delay is up.
         if(!log) { //We aren't logging data
@@ -324,21 +352,19 @@ public class SensorLog {
             textview.setText("File written with " + datatolog.toString() + ".\n");
         }
 
-
-
     }
 
 
-
-    /*
+/*
+    @Override
     protected void onPause() {
         super.onPause();
         sensensorManager.unregisterListener(this);
     }
-
+    @Override
     protected void onResume() {
         super.onResume();
         sensensorManager.registerListener(this, senGyroscope, SensorManager.SENSOR_DELAY_NORMAL);
     }
-    */
+*/
 }

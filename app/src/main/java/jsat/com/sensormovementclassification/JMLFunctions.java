@@ -2,6 +2,7 @@ package jsat.com.sensormovementclassification;
 
 import android.os.Environment;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.widget.TextView;
 
 import java.io.File;
@@ -44,10 +45,14 @@ public class JMLFunctions {
     }
 
     /** Takes xyz data and returns the classification **/
-    public String classify(double x1, double y1, double z1, double x2, double y2, double z2, double a){
-        if(x1 == Double.NaN) return "NaN found...";
-            DataPoint pointtoclassify = new DataPoint(DenseVector.toDenseVec(x1,y1,z1,x2,y2,z2,a));
-        //textview.append("Classifying: " + pointtoclassify.toString() + "\n");
+    //public String classify(double x1, double y1, double z1, double x2, double y2, double z2, double a){
+    public String classify(List<Double> values){
+        DataPoint pointtoclassify = new DataPoint(new DenseVector(values));
+        //check for a NaN value
+        if(values.contains(Double.NaN)){
+            Log.w("Problem Child: ", pointtoclassify.toString());
+            return "NaN found...";
+        }
         CategoricalResults results = test.classify(pointtoclassify);
         return results.toString();
     }
@@ -56,6 +61,7 @@ public class JMLFunctions {
 
         textview.append("Attempting to load all training data files.\n");
         List<DataSet> datasetslist = new ArrayList<DataSet>();
+
 
         File f = new File(DATA_PATH + TRAIN_DATA_PATH);
 
@@ -69,41 +75,10 @@ public class JMLFunctions {
         }
         textview.append("Data sets loaded, now attempting merge.\n");
 
-        /*
-        //Get attributes
-        int attribs = datasetslist.get(0).getNumNumericalVars();
 
-        //Get total categorical vars and set them.
-        int total_cats = 0;
-        for(DataSet d : datasetslist){
-            total_cats += d.getNumCategoricalVars();
-        }
-        CategoricalData decidingdata = new CategoricalData(total_cats);
-        decidingdata.setCategoryName("Action");
-        //populate the categorical data with the names of the categories in the datasets.
-        int index=0;
-        for(DataSet d : datasetslist){
-            decidingdata.setOptionName(d.getCategories()[0].getOptionName(0), index);
-            textview.append("TEST: " + decidingdata.getOptionName(1) + ".\n");
-            index++;
-        }
-        textview.append(decidingdata.getNumOfCategories()+ ", " + attribs + "\n");
-
-        mergeddataset = new ClassificationDataSet(attribs, new CategoricalData[0], decidingdata);
-        //DataSet mergeddataset = new ClassificationDataSet(datasetslist.get(0), 0);
-
-
-        //Add all the points from the loaded files into the new dataset.
-        int classification=0;
-        for(DataSet d : datasetslist){
-            for(int i=0; i<d.getSampleSize(); i++){
-                mergeddataset.addDataPoint(d.getDataPoint(i).getNumericalValues(), classification);
-                //textview.append("DEBUG: " + d.getDataPoint(i).getNumericalValues() + "\n");
-            }
-           classification++;
-        }
-        */
-        mergeddataset = new ClassificationDataSet(7, new CategoricalData[0], new CategoricalData(2));
+        int num_classifications = datasetslist.size();
+        int num_attributes = datasetslist.get(0).getNumNumericalVars();
+        mergeddataset = new ClassificationDataSet(num_attributes, new CategoricalData[0], new CategoricalData(num_classifications));
         int classification=0;
         for(DataSet d : datasetslist){
             for(int i=0; i<d.getSampleSize(); i++){
@@ -119,7 +94,7 @@ public class JMLFunctions {
         textview.append("Dataset contains " + mergeddataset.getNumCategoricalVars() + " categories!\n");
         for(int i = 0; i <  mergeddataset.getNumCategoricalVars(); i++)
             textview.append("\t" + mergeddataset.getCategoryName(i) + "\n");
-        textview.append("DEBUG " + mergeddataset.getNumCategoricalVars() + "\n");
+        //textview.append("DEBUG " + mergeddataset.getNumCategoricalVars() + "\n");
 
 
         /*
@@ -147,7 +122,7 @@ public class JMLFunctions {
         */
 
         //subject to change.
-        test = new RandomForest(2);
+        test = new RandomForest(num_attributes);
 
 
         //ClassificationDataSet testthing = new ClassificationDataSet(datasetslist.get(0), 0);
