@@ -36,7 +36,6 @@ public class JMLFunctions {
 
     File DATA_PATH = Environment.getExternalStorageDirectory();
     String TRAIN_DATA_PATH = "/SensorExperiment/TrainData";
-    String TRAIN_FILE_NAME = "/train2.arff";
 
 
     public JMLFunctions(TextView textview){
@@ -58,6 +57,10 @@ public class JMLFunctions {
     }
 
     public void readTrainingData(){
+
+        //Test if proper directories exist. If not, create them.
+        File tmp_f = new File(DATA_PATH + TRAIN_DATA_PATH);
+        if(!tmp_f.exists()) tmp_f.mkdirs();
 
         textview.append("Attempting to load all training data files.\n");
         List<DataSet> datasetslist = new ArrayList<DataSet>();
