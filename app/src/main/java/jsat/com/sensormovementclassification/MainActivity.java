@@ -1,8 +1,9 @@
 package jsat.com.sensormovementclassification;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
 import android.os.PowerManager;
-import android.os.CountDownTimer;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -21,6 +22,8 @@ public class MainActivity extends ActionBarActivity {
     SensorLog sensorLog;
     //We have to declare our machine learning class
     JMLFunctions jml;
+    //Our global network server
+    NetworkServer server;
 
     TextView logtext;
 
@@ -39,6 +42,9 @@ public class MainActivity extends ActionBarActivity {
 
         logtext = (TextView)findViewById(R.id.textView);
         logtext.setMovementMethod(new ScrollingMovementMethod());
+
+
+        server = new NetworkServer((TextView)findViewById(R.id.textView),this);
 
 
         jml = new JMLFunctions((TextView)findViewById(R.id.textView));
@@ -93,6 +99,16 @@ public class MainActivity extends ActionBarActivity {
             sensorLog.stopService();
             //logtext.clearComposingText();
             logtext.append("Stopped.\n");
+        }
+    }
+
+    public void toggleNetwork(View view){
+        boolean on = ((ToggleButton) view).isChecked();
+        if (on) {
+            server.startService();
+
+        } else {
+            server.stopService();
         }
     }
 

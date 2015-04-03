@@ -51,7 +51,7 @@ public class SensorLog {
 
     public SensorLog(TextView textview, Context mContext, JMLFunctions jmlfuncs){
         this.textview = textview;
-        //the context passing is so this class can use getSystemService
+        //the mContext passing is so this class can use getSystemService
         this.mContext = mContext;
         this.jmlfuncs = jmlfuncs;
     }
