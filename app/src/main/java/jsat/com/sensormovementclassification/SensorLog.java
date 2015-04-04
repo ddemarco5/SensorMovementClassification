@@ -48,6 +48,8 @@ public class SensorLog {
 
     Context mContext;
     JMLFunctions jmlfuncs;
+    private String lastclassification = "No classification yet.";
+
 
     public SensorLog(TextView textview, Context mContext, JMLFunctions jmlfuncs){
         this.textview = textview;
@@ -135,6 +137,7 @@ public class SensorLog {
                 new Double(accelavg.getZ()),
                 new Double(lightavg));
         String classification = jmlfunc.classify(datalist);
+        lastclassification = classification;
         viewtoprint.append(classification + "\n");
 
         int scrollAmount = viewtoprint.getLayout().getLineTop(viewtoprint.getLineCount()) - viewtoprint.getHeight();
@@ -147,6 +150,10 @@ public class SensorLog {
         gyroDataVec.clear();
         accelDataVec.clear();
         lightDataVec.clear();
+    }
+
+    public String getLastClassification(){
+        return lastclassification;
     }
 
     private void cycleRecordData(JMLFunctions jmlfunc, String classification){
@@ -333,6 +340,7 @@ public class SensorLog {
     protected void stopService(){
         h.removeCallbacksAndMessages(null);
         sensorManager.unregisterListener(sensorListener);
+        lastclassification = "Classification stopped";
 
 
         if(log == true){

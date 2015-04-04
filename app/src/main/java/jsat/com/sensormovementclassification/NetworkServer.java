@@ -30,8 +30,11 @@ public class NetworkServer {
     private TextView serverStatus;
     public final String SERVERIP; //gets set in constructor
     public final int SERVERPORT = 8080;
+    public final SensorLog sensorlog;
 
-    public NetworkServer(TextView textview, Context context){
+    //The sensorlog class that is being used is passed to the network server so we can get the last classification
+    public NetworkServer(TextView textview, Context context, SensorLog sensorlog){
+        this.sensorlog = sensorlog;
         serverStatus = textview;
         //This needs to be done in here for some unknown reason. Otherwise we will lose the context
         SERVERIP = getIpAddress(context);
@@ -108,16 +111,16 @@ public class NetworkServer {
                         Log.d("NETWORK", "Network thread started");
                         // LISTEN FOR INCOMING CLIENTS
                         clientSocket = serverSocket.accept();
+                        final PrintWriter output = new PrintWriter(clientSocket.getOutputStream());
+                        /*try {
+                            final PrintWriter output = new PrintWriter(clientSocket.getOutputStream());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }*/
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
                                 serverStatus.append("Connected.\n");
-                                PrintWriter output = null;
-                                try {
-                                    output = new PrintWriter(clientSocket.getOutputStream());
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
                                 output.print("Welcome.\n");
                                 output.flush();
                             }
@@ -133,6 +136,8 @@ public class NetworkServer {
                                         public void run() {
                                             // DO WHATEVER YOU WANT TO THE FRONT END
                                             // THIS IS WHERE YOU CAN BE CREATIVE
+                                            output.print(sensorlog.getLastClassification()+"\n");
+                                            output.flush();
                                         }
                                     });
                                 }
@@ -172,8 +177,7 @@ public class NetworkServer {
     }
     private String getIpAddress(Context context) {
         if(context == null){
-            Log.d("Stuff", "WFM is null biatch");
-            return "poop";
+            return "Null Context";
         }
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();

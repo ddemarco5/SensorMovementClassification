@@ -43,14 +43,16 @@ public class MainActivity extends ActionBarActivity {
         logtext = (TextView)findViewById(R.id.textView);
         logtext.setMovementMethod(new ScrollingMovementMethod());
 
-
-        server = new NetworkServer((TextView)findViewById(R.id.textView),this);
-
-
         jml = new JMLFunctions((TextView)findViewById(R.id.textView));
         jml.readTrainingData();
         pm = (PowerManager) getSystemService(this.POWER_SERVICE);
         wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Log Wakelock");
+
+
+        sensorLog = new SensorLog(logtext, this, jml);
+
+        server = new NetworkServer((TextView)findViewById(R.id.textView),this, sensorLog);
+
     }
 
     @Override
@@ -87,7 +89,7 @@ public class MainActivity extends ActionBarActivity {
             //get our wakelock
             wl.acquire();
             //create our sensorlog activity
-            sensorLog = new SensorLog(logtext, this, jml);
+            //sensorLog = new SensorLog(logtext, this, jml);
 
             sensorLog.startListenerService();
             logtext.append("Started.\n");
